@@ -11,7 +11,7 @@ module "opa_policy_set" {
   
   # Apply to specific workspaces
   global       = false
-  workspace_ids = ["ws-v93RUWTMgJxoX18s"]
+  workspace_ids = ["ws-v93RUQTMfJxoX18s"]
 }
 
 

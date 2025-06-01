@@ -1,21 +1,20 @@
 provider "tfe" {
-  # Configure with your HCP Terraform token
+  # Configure with your HCP Terraform token either as an environment var or as an input
   # token = var.tfe_token
 }
 
 module "policy_set" {
   source = "../../"
 
-  name         = "cis-policies"
-  description  = "Sentinel policies supporting CIS framework"
-  organization = var.organization
-  policy_kind  = "sentinel"
-  
+  name              = "cis-policies"
+  description       = "Sentinel policies supporting CIS framework"
+  organization      = var.organization
+  policy_kind       = "sentinel"
   policy_source     = "git"
   git_url           = "https://github.com/quixoticmonk/policy-library-CIS-Policy-Set-for-AWS-Terraform.git"
   git_branch        = "main"
-  git_policies_path = "policies"
-  
+  git_policies_path = "./"
+
   # Apply globally to all workspaces
   global = true
 }

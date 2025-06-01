@@ -25,7 +25,7 @@ variable "policy_kind" {
 }
 
 variable "agent_enabled" {
-  description = "Whether or not the policy set is run as a policy evaluation within the agent"
+  description = "Whether or not the policy set is run as a policy evaluation within the agent. Always true for OPA policies regardless of this setting."
   type        = bool
   default     = true
 }
@@ -37,7 +37,7 @@ variable "policy_tool_version" {
 }
 
 variable "overridable" {
-  description = "Whether or not users can override this policy when it fails during a run (only valid for OPA policies)"
+  description = "Whether or not users can override this policy when it fails during a run. Only valid for OPA policies; ignored for Sentinel policies."
   type        = bool
   default     = false
 }
@@ -86,5 +86,3 @@ variable "git_policies_path" {
   type        = string
   default     = ""
 }
-
-

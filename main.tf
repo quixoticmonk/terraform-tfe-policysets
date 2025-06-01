@@ -5,6 +5,8 @@
  * It supports two policy source options:
  * - Local policy files
  * - Public Git repository
+ *
+ * Note: For OPA policies, agent_enabled is always set to true and overridable is only applied for OPA policies.
  */
 
 # Data source to create a slug from local policy files
@@ -14,10 +16,10 @@ data "tfe_slug" "policy_set" {
 }
 
 # Create a local directory for Git clone if using git source
-resource "null_resource" "git_clone" {
+resource "terraform_data" "git_clone" {
   count = var.policy_source == "git" ? 1 : 0
 
-  triggers = {
+  triggers_replace = {
     git_url    = var.git_url
     git_branch = var.git_branch
     timestamp  = timestamp() # Force periodic refresh to catch upstream changes
@@ -37,7 +39,7 @@ data "tfe_slug" "git_policy_set" {
   count       = var.policy_source == "git" ? 1 : 0
   source_path = "${path.module}/tmp/git_policies/${var.git_policies_path}"
   
-  depends_on = [null_resource.git_clone]
+  depends_on = [terraform_data.git_clone]
 }
 
 # Create the policy set resource for global policies
@@ -47,9 +49,9 @@ resource "tfe_policy_set" "global_policy_set" {
   description         = var.description
   organization        = var.organization
   kind                = var.policy_kind
-  agent_enabled       = var.agent_enabled
+  agent_enabled       = var.policy_kind == "opa" ? true : var.agent_enabled
   policy_tool_version = var.policy_tool_version
-  overridable         = var.overridable
+  overridable         = var.policy_kind == "opa" ? var.overridable : null
   
   # Set global to true
   global = true
@@ -65,9 +67,9 @@ resource "tfe_policy_set" "workspace_policy_set" {
   description         = var.description
   organization        = var.organization
   kind                = var.policy_kind
-  agent_enabled       = var.agent_enabled
+  agent_enabled       = var.policy_kind == "opa" ? true : var.agent_enabled
   policy_tool_version = var.policy_tool_version
-  overridable         = var.overridable
+  overridable         = var.policy_kind == "opa" ? var.overridable : null
     
   # Include workspace_ids
   workspace_ids = var.workspace_ids
