@@ -1,0 +1,11 @@
+# restrict-instance-type.sentinel
+import "tfplan"
+
+# Main rule that requires all EC2 instances to use allowed types
+main = rule {
+  all tfplan.resources.aws_instance as _, instances {
+    all instances as _, instance {
+      instance.applied.instance_type in ["t2.micro", "t3.micro"]
+    }
+  }
+}
