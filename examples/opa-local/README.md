@@ -17,27 +17,25 @@ terraform apply
 
 ## Policy Details
 
-The example includes an OPA policy that restricts EC2 instance types to only allow t2.micro and t3.micro instances.
+The example includes one OPA policy that prevents deployments on Fridays.
 
-### restrict_instance_type.rego
+### no_friday_deploys.rego
 
-This policy checks all AWS EC2 instances in the Terraform plan and ensures they use only the allowed instance types.
+This policy prevents any deployments from occurring on Fridays.
 
 ```rego
-# restrict_instance_type.rego
-package terraform.policies
+# no_friday_deploys.rego
+package terraform.policies.no_friday_deploys
 
-import input.tfplan as tfplan
-
-# Deny rule for non-compliant instances
+# Deny rule for deployments on Friday
 deny[msg] {
-    resource := tfplan.resource_changes[_]
-    resource.type == "aws_instance"
-    resource.change.after.instance_type not in ["t2.micro", "t3.micro"]
+    # Get the current day of the week as a string
+    day := time.weekday(time.now_ns())
+    day == "Friday"
     
     msg := sprintf(
-        "Instance type %s is not allowed. Use t2.micro or t3.micro instead.",
-        [resource.change.after.instance_type]
+        "Deployments are not allowed on Fridays. Please try again on another day.",
+        []
     )
 }
 ```

@@ -1,5 +1,5 @@
-policy "restrict_instance_type" {
-  query="data.terraform.policies.restrict_instance_type.deny"
-  description="Restrict instance type"
+policy "no_friday_deploys" {
+  query="data.terraform.policies.no_friday_deploys.deny"
+  description="Prevent deployments on Fridays"
   enforcement_level = "mandatory"
 }

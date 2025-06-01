@@ -3,7 +3,7 @@ module "sentinel_policy_set" {
 
   name         = "my-sentinel-policies"
   description  = "Sentinel policies for cost control"
-  organization = var.organization
+  organization = "my-org"
   policy_kind  = "sentinel"
   
   policy_source      = "local"
@@ -11,9 +11,4 @@ module "sentinel_policy_set" {
   
   # Apply to specific workspaces
   global = true
-}
-
-variable "organization" {
-  description = "HCP Terraform organization name"
-  type        = string
 }
