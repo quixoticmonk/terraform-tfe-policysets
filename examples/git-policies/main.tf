@@ -8,7 +8,7 @@ module "policy_set" {
 
   name              = "cis-policies"
   description       = "Sentinel policies supporting CIS framework"
-  organization      = var.organization
+  organization      = "my-org"
   policy_kind       = "sentinel"
   policy_source     = "git"
   git_url           = "https://github.com/quixoticmonk/policy-library-CIS-Policy-Set-for-AWS-Terraform.git"
@@ -17,11 +17,6 @@ module "policy_set" {
 
   # Apply globally to all workspaces
   global = true
-}
-
-variable "organization" {
-  description = "HCP Terraform organization name"
-  type        = string
 }
 
 output "policy_set_id" {

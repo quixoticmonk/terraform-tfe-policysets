@@ -208,4 +208,3 @@ module "opa_policy_set" {
   workspace_ids = ["ws-v93RUQTMfJxoX18s"]
 }
 ```
-
