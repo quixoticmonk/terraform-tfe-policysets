@@ -20,16 +20,17 @@ resource "terraform_data" "git_clone" {
   count = var.policy_source == "git" ? 1 : 0
 
   triggers_replace = {
-    git_url    = var.git_url
-    git_branch = var.git_branch
-    timestamp  = timestamp() # Force periodic refresh to catch upstream changes
+    git_url            = var.git_url
+    git_branch         = var.git_branch
+    ingress_submodules = var.ingress_submodules
+    timestamp          = timestamp() # Force periodic refresh to catch upstream changes
   }
 
   provisioner "local-exec" {
     command = <<-EOT
       mkdir -p ${path.module}/tmp
       rm -rf ${path.module}/tmp/git_policies
-      git clone --depth 1 --branch ${var.git_branch} ${var.git_url} ${path.module}/tmp/git_policies
+      git clone --depth 1 --branch ${var.git_branch} ${var.ingress_submodules ? "--recurse-submodules" : ""} ${var.git_url} ${path.module}/tmp/git_policies
     EOT
   }
 }
@@ -56,8 +57,20 @@ resource "tfe_policy_set" "global_policy_set" {
   # Set global to true
   global = true
   
-  # Set slug based on policy source
-  slug = var.policy_source == "local" ? data.tfe_slug.policy_set[0] : data.tfe_slug.git_policy_set[0]
+  # Set slug based on policy source (only for local and git)
+  slug = var.policy_source == "vcs" ? null : (var.policy_source == "local" ? data.tfe_slug.policy_set[0] : data.tfe_slug.git_policy_set[0])
+  
+  # VCS repo configuration for VCS source
+  dynamic "vcs_repo" {
+    for_each = var.policy_source == "vcs" ? [1] : []
+    content {
+      identifier                 = var.vcs_identifier
+      branch                     = var.git_branch
+      ingress_submodules        = var.ingress_submodules
+      oauth_token_id            = var.oauth_token_id
+      github_app_installation_id = var.github_app_installation_id
+    }
+  }
 }
 
 # Create the policy set resource for workspace-specific policies
@@ -74,6 +87,18 @@ resource "tfe_policy_set" "workspace_policy_set" {
   # Include workspace_ids
   workspace_ids = var.workspace_ids
   
-  # Set slug based on policy source
-  slug = var.policy_source == "local" ? data.tfe_slug.policy_set[0] : data.tfe_slug.git_policy_set[0]
+  # Set slug based on policy source (only for local and git)
+  slug = var.policy_source == "vcs" ? null : (var.policy_source == "local" ? data.tfe_slug.policy_set[0] : data.tfe_slug.git_policy_set[0])
+  
+  # VCS repo configuration for VCS source
+  dynamic "vcs_repo" {
+    for_each = var.policy_source == "vcs" ? [1] : []
+    content {
+      identifier                 = var.vcs_identifier
+      branch                     = var.git_branch
+      ingress_submodules        = var.ingress_submodules
+      oauth_token_id            = var.oauth_token_id
+      github_app_installation_id = var.github_app_installation_id
+    }
+  }
 }
