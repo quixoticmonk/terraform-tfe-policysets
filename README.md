@@ -27,6 +27,11 @@ For detailed examples of local policy files, see:
 For an example of using policies from a Git repository, see:
 - [Git Policies Example](./examples/git-policies)
 
+### VCS Integration
+
+For an example of using VCS integration with private repositories, see:
+- [VCS Integration Example](./examples/vcs-integration)
+
 ```hcl
 module "policy_set" {
   source = "path/to/terraform-policy-sets"
@@ -116,12 +121,32 @@ variable "organization" {
 }
 ```
 
+### VCS Integration (Private Repositories)
+
+```hcl
+module "policy_set" {
+  source = "../../"
+
+  name              = "private-policies"
+  description       = "Private repository policies via VCS integration"
+  organization      = "my-org"
+  policy_kind       = "sentinel"
+  policy_source     = "vcs"
+  vcs_identifier    = "my-org/private-policy-repo"
+  git_branch        = "main"
+  oauth_token_id    = "ot-abc123"
+  
+  # Apply globally to all workspaces
+  global = true
+}
+```
+
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) | >= 0.40.0 |
+| <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) | >= 0.68.0 |
 
 ## Providers
 
@@ -150,17 +175,21 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_name"></a> [name](#input\_name) | Name of the policy set | `string` | n/a | yes |
 | <a name="input_organization"></a> [organization](#input\_organization) | Name of the HCP Terraform organization | `string` | n/a | yes |
-| <a name="input_policy_source"></a> [policy\_source](#input\_policy\_source) | Source of the policies: 'local' for local files or 'git' for public git repository | `string` | n/a | yes |
+| <a name="input_policy_source"></a> [policy\_source](#input\_policy\_source) | Source of the policies: 'local' for local files, 'git' for public git repository, or 'vcs' for VCS integration | `string` | n/a | yes |
 | <a name="input_agent_enabled"></a> [agent\_enabled](#input\_agent\_enabled) | Whether or not the policy set is run as a policy evaluation within the agent. Always true for OPA policies regardless of this setting. | `bool` | `true` | no |
 | <a name="input_description"></a> [description](#input\_description) | Description of the policy set's purpose | `string` | `null` | no |
 | <a name="input_git_branch"></a> [git\_branch](#input\_git\_branch) | Branch of the Git repository to use (when policy\_source = 'git') | `string` | `"main"` | no |
 | <a name="input_git_policies_path"></a> [git\_policies\_path](#input\_git\_policies\_path) | Path within the Git repository where policies are located (when policy\_source = 'git') | `string` | `""` | no |
 | <a name="input_git_url"></a> [git\_url](#input\_git\_url) | URL of the public Git repository containing policies (required when policy\_source = 'git') | `string` | `null` | no |
+| <a name="input_github_app_installation_id"></a> [github\_app\_installation\_id](#input\_github\_app\_installation\_id) | GitHub App installation ID (alternative to OAuth token for private repos) | `string` | `null` | no |
 | <a name="input_global"></a> [global](#input\_global) | Whether policies in this set will apply to all workspaces | `bool` | `true` | no |
+| <a name="input_ingress_submodules"></a> [ingress\_submodules](#input\_ingress\_submodules) | Whether to fetch submodules when cloning the repository | `bool` | `false` | no |
 | <a name="input_local_policies_path"></a> [local\_policies\_path](#input\_local\_policies\_path) | Path to the directory containing local policy files (required when policy\_source = 'local') | `string` | `null` | no |
+| <a name="input_oauth_token_id"></a> [oauth\_token\_id](#input\_oauth\_token\_id) | OAuth token ID for VCS integration (required when policy\_source = 'vcs') | `string` | `null` | no |
 | <a name="input_overridable"></a> [overridable](#input\_overridable) | Whether or not users can override this policy when it fails during a run. Only valid for OPA policies; ignored for Sentinel policies. | `bool` | `false` | no |
 | <a name="input_policy_kind"></a> [policy\_kind](#input\_policy\_kind) | The policy-as-code framework to use (sentinel or opa) | `string` | `"sentinel"` | no |
 | <a name="input_policy_tool_version"></a> [policy\_tool\_version](#input\_policy\_tool\_version) | The policy tool version to run the evaluation against | `string` | `"latest"` | no |
+| <a name="input_vcs_identifier"></a> [vcs\_identifier](#input\_vcs\_identifier) | VCS repository identifier in format 'org/repo' (required when policy\_source = 'vcs') | `string` | `null` | no |
 | <a name="input_workspace_ids"></a> [workspace\_ids](#input\_workspace\_ids) | List of workspace IDs to which the policy set should be attached (cannot be used with global = true) | `list(string)` | `[]` | no |
 
 ## Outputs
