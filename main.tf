@@ -38,7 +38,7 @@ resource "terraform_data" "git_clone" {
 data "tfe_slug" "git_policy_set" {
   count       = var.policy_source == "git" ? 1 : 0
   source_path = "${path.module}/tmp/git_policies/${var.git_policies_path}"
-  
+
   depends_on = [terraform_data.git_clone]
 }
 
@@ -50,12 +50,12 @@ resource "tfe_policy_set" "global_policy_set" {
   organization        = var.organization
   kind                = var.policy_kind
   agent_enabled       = var.policy_kind == "opa" ? true : var.agent_enabled
-  policy_tool_version = var.policy_tool_version
+  policy_tool_version = var.policy_kind == "opa" && var.policy_tool_version == "latest" ? null : var.policy_tool_version
   overridable         = var.policy_kind == "opa" ? var.overridable : null
-  
+
   # Set global to true
   global = true
-  
+
   # Set slug based on policy source
   slug = var.policy_source == "local" ? data.tfe_slug.policy_set[0] : data.tfe_slug.git_policy_set[0]
 }
@@ -68,12 +68,12 @@ resource "tfe_policy_set" "workspace_policy_set" {
   organization        = var.organization
   kind                = var.policy_kind
   agent_enabled       = var.policy_kind == "opa" ? true : var.agent_enabled
-  policy_tool_version = var.policy_tool_version
+  policy_tool_version = var.policy_kind == "opa" && var.policy_tool_version == "latest" ? null : var.policy_tool_version
   overridable         = var.policy_kind == "opa" ? var.overridable : null
-    
+
   # Include workspace_ids
   workspace_ids = var.workspace_ids
-  
+
   # Set slug based on policy source
   slug = var.policy_source == "local" ? data.tfe_slug.policy_set[0] : data.tfe_slug.git_policy_set[0]
 }

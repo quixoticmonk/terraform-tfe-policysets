@@ -121,14 +121,14 @@ variable "organization" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) | >= 0.40.0 |
+| <a name="requirement_tfe"></a> [tfe](#requirement\_tfe) | >= 0.71.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
-| <a name="provider_tfe"></a> [tfe](#provider\_tfe) | >= 0.40.0 |
+| <a name="provider_tfe"></a> [tfe](#provider\_tfe) | >= 0.71.0 |
 
 ## Modules
 
@@ -182,10 +182,10 @@ module "sentinel_policy_set" {
   description  = "Sentinel policies for cost control"
   organization = "my-org"
   policy_kind  = "sentinel"
-  
-  policy_source      = "local"
+
+  policy_source       = "local"
   local_policies_path = "${path.module}/policies"
-  
+
   # Apply to specific workspaces
   global = true
 }
